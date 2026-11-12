@@ -20,13 +20,24 @@ jobs:
       - name: Extract Android project
         run: |
           unzip -o AFKCloud_Companion_0.1.0-1.zip -d source
-          ls -la source
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+
+      - name: Fix Java imports
+        run: |
+          python3 - <<'PY'
+          p = "source/app/src/main/java/com/afkcloud/companion/CaptureService.java"
+          s = open(p).read()
+          s = s.replace(
+              "import android.app.*;",
+              "import android.app.*;\nimport android.hardware.display.DisplayManager;\nimport android.hardware.display.VirtualDisplay;"
+          )
+          open(p, "w").write(s)
+          PY
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
